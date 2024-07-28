@@ -1,3 +1,73 @@
+# CPHOS WeChat Robot
+
+This project is forked from [zhayujie/chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat). 
+
+## Quick Start
+
+1. Environment
+
+```bash
+conda create -n wechatROBOT "python==3.8"
+conda activate wechatROBOT
+pip install -r requirements.txt
+```
+
+2. Run
+
+```bash
+cp config-CPHOS.json config.json
+nohup python3 app.py & tail -f nohup.out
+```
+
+The QR code will emit in the terminal! Scan it with your WeChat to login. Then the robot will start to work.
+
+3. Test
+
+Try to at the robot in the group "CPHOS技术组工作群" or send a message starting with "@bot" in that group. The robot should reply.
+
+### The Current Functions of the Robot
+
+1. Whatever message you send, the robot only replies "Hello, World!"
+2. Special tokens:
+    - `#清除记忆`
+    - `#清除所有`
+
+You can find the special tokens in [cphos_bot.py](./bot/CPHOS_bot/cphos_bot.py).
+
+
+## Changing Configurations
+
+The configuration file is [config.json](./config.json). **PLEASE NOTICE** that this file is ignored by git, so you need to make modifications on `config-CPHOS.json` if you want to change the configurations.
+
+Please refer to the original [README](#二配置) for the configurations. Here, I list some important configurations:
+
+```json
+{
+// (Other configurations)
+  "single_chat_prefix": [ // The prefix to trigger the robot in private chat
+    "bot",
+    "@bot"
+  ],
+  "single_chat_reply_prefix": "[bot] ",
+  "group_chat_prefix": [ // The prefix to trigger the robot in group chat. The robot will also reply if the user at the robot.
+    "@bot"
+  ],
+  "group_name_white_list": [ // The robot only replies in the groups in this list
+    "CPHOS技术组工作群"
+  ],
+}
+```
+
+## Development
+
+The interface is [cphos_bot.py](./bot/CPHOS_bot/cphos_bot.py), so ideally all modifications can be done inside the file.
+
+For reference, the member function `ChatChannel._compose_context` in [chat_channel.py](./channel/chat_channel.py) defines how the messages received in WeChat are processed. If you want to change the functions, you can modify it.
+
+The whole structure and the calling hierarchy of the project are very complex and I can't understand all of them.
+
+## The original README.md is as follows
+
 # 简介
 
 > chatgpt-on-wechat（简称CoW）项目是基于大模型的智能对话机器人，支持微信公众号、企业微信应用、飞书、钉钉接入，可选择GPT3.5/GPT4.0/Claude/Gemini/LinkAI/ChatGLM/KIMI/文心一言/讯飞星火/通义千问/LinkAI，能处理文本、语音和图片，通过插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业AI应用。

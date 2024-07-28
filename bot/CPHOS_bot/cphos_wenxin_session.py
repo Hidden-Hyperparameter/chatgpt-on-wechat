@@ -39,10 +39,10 @@ class CPHOSWechatSession(Session):
         return cur_tokens
 
     def calc_tokens(self):
-        return num_tokens_from_messages(self.messages, self.model)
+        return num_tokens_from_messages(self.messages)
 
 
-def num_tokens_from_messages(messages, model):
+def num_tokens_from_messages(messages, model=None):
     """Returns the number of tokens used by a list of messages."""
     tokens = 0
     for msg in messages:

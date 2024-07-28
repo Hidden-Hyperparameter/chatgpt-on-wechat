@@ -35,6 +35,26 @@ class ChatChannel(Channel):
 
     # 根据消息构造context，消息内容相关的触发项写在这里
     def _compose_context(self, ctype: ContextType, content, **kwargs):
+        """
+        Compose context according to message `content`.
+
+        Args:
+            ctype: ContextType
+            content: str
+            **kwargs: dict
+        
+        Returns:
+            Context: the processed context. The content is stored as `context.content`.
+        
+        Details:
+            - Text Message:
+                - Group Chat: only process the message in **group white list**, and either
+                    - contain the **group chat prefix** 
+                    - or contain the **group chat keyword**.
+                - Single Chat: ...
+                - Notice that the final processed message may be **Empty** (denoted as `<Empty Message>`), since the prefix is removed from `context.content`.
+            - Voice Message: ...
+        """
         context = Context(ctype, content)
         context.kwargs = kwargs
         # context首次传入时，origin_ctype是None,
@@ -154,7 +174,10 @@ class ChatChannel(Channel):
                 context.type = ContextType.IMAGE_CREATE
             else:
                 context.type = ContextType.TEXT
-            context.content = content.strip()
+            if content.strip() == "":
+                context.content = '<Empty Message>'
+            else:
+                context.content = content.strip()
             if "desire_rtype" not in context and conf().get("always_reply_voice") and ReplyType.VOICE not in self.NOT_SUPPORT_REPLYTYPE:
                 context["desire_rtype"] = ReplyType.VOICE
         elif context.type == ContextType.VOICE:
