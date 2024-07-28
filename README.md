@@ -6,6 +6,12 @@ This project is forked from [zhayujie/chatgpt-on-wechat](https://github.com/zhay
 
 For building the robot on a remote server, see [server.md](./server.md).
 
+**Make sure** that you have clone the repo recursively. If you haven't, do it by:
+
+```bash
+git submodule update --init --recursive
+```
+
 1. Environment
 
 ```bash
@@ -14,7 +20,20 @@ conda activate CPHOS # Or: source activate CPHOS
 pip install -r requirements.txt
 ```
 
-2. Run
+2. Add API Key
+
+```bash
+vim bot/CPHOS_bot/cphos_model/.env
+```
+
+add two lines into it:
+
+```
+OPENAI_API_KEY="sk-your-openai-api-key"
+API_KEY="your.glmapikey"
+```
+
+3. Run
 
 ```bash
 cp config-CPHOS.json config.json
@@ -23,7 +42,7 @@ nohup python3 app.py & tail -f nohup.out
 
 The QR code will emit in the terminal! Scan it with your WeChat to login. Then the robot will start to work.
 
-3. Test
+4. Test
 
 Try to at the robot in the group "CPHOS技术组工作群" or send a message starting with "@bot" in that group. The robot should reply.
 
