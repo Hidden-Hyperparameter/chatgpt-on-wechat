@@ -77,7 +77,7 @@ class CPHOSBot(Bot):
             final_msg =  messages[-1]['content'].replace(EMPTY_TOKEN, '')
             if final_msg == '':
                 return {'status': True, 'content': '不应该发送空消息。' + CPHOSBot.HELP_MSG}
-            return {'status':True, 'content': answer_user_question(user_nickname,final_msg)}
+            return {'status':True, 'content': answer_user_question(user_nickname,final_msg,max_try=5)}
             # return {'status': True, "content": "Hello, World!"}
         except Exception as e:
             need_retry = retry_count < 2
