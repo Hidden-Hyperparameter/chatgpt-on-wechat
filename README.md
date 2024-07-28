@@ -40,7 +40,7 @@ API_KEY="your.glmapikey"
 Then copy the model into the folder:
 
 ```bash
-rm -rf bot/CPHOS_bot/cphos_model/universal-sentence-encoder-multilingual
+# Download the model from https://tfhub.dev/google/universal-sentence-encoder-multilingual/3
 mv /path/to/your/model/folder bot/CPHOS_bot/cphos_model/universal-sentence-encoder-multilingual
 ```
 
