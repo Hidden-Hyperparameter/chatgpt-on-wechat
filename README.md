@@ -4,11 +4,13 @@ This project is forked from [zhayujie/chatgpt-on-wechat](https://github.com/zhay
 
 ## Quick Start
 
+For building the robot on a remote server, see [server.md](./server.md).
+
 1. Environment
 
 ```bash
-conda create -n wechatROBOT "python==3.8"
-conda activate wechatROBOT
+conda create -n CPHOS "python==3.8"
+conda activate CPHOS # Or: source activate CPHOS
 pip install -r requirements.txt
 ```
 

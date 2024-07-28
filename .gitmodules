@@ -1,0 +1,3 @@
+[submodule "bot/CPHOS_bot/cphos_model"]
+	path = bot/CPHOS_bot/cphos_model
+	url = https://github.com/Hidden-Hyperparameter/CPHOS_AIReplyer_Playground.git

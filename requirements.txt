@@ -1,4 +1,3 @@
-openai==0.27.8
 HTMLParser>=0.0.2
 PyQRCode>=1.2.1
 qrcode>=7.4.2
@@ -8,3 +7,22 @@ Pillow
 pre-commit
 web.py
 linkai>=0.0.6.0
+
+# These requirements are for the CPHOS model package
+zhipuai==1.0.7
+pymysql
+openpyxl
+numpy
+matplotlib
+PyMuPDF
+scikit-learn
+tensorflow-text==2.10.0
+tensorflow==2.10.1 # do not support gpu on windows, slower but more stable since we do not use gpu.
+tensorflow-hub
+gradio
+#langchain-serve>=0.0.19
+regex
+# openai we use a different virsion of openai that may cause some conflict, to avoid this, we copy the openai folder here and do not need to install some openai package again.
+openai<1.0.0
+# required for openai
+aiohttp

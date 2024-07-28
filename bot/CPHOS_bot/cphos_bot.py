@@ -8,10 +8,14 @@ from bot.session_manager import SessionManager
 from bridge.context import ContextType
 from bridge.reply import Reply, ReplyType
 from common.log import logger
+from common.const import EMPTY_TOKEN
 from config import conf
 from .cphos_wenxin_session import CPHOSWechatSession
+from .cphos_model.work_file import answer_user_question
 
 class CPHOSBot(Bot):
+
+    HELP_MSG = "使用方法：首先@我，然后输入问题"
 
     def __init__(self):
         super().__init__()
@@ -27,8 +31,9 @@ class CPHOSBot(Bot):
         self.sessions = SessionManager(CPHOSWechatSession)
 
     def reply(self, query, context=None):
-        print('-'*20,'\n','[CPHOSBot] query={}'.format(query),'\n','-'*20)
+        print('-'*20)
         # acquire reply content
+        user_nickname = context["msg"].from_user_nickname
         if context and context.type:
             if context.type == ContextType.TEXT:
                 logger.info("[CPHOSBot] query={}".format(query))
@@ -42,7 +47,7 @@ class CPHOSBot(Bot):
                     reply = Reply(ReplyType.INFO, "所有人记忆已清除")
                 else:
                     session = self.sessions.session_query(query, session_id)
-                    result = self.reply_text(session)
+                    result = self.reply_text(session,user_nickname)
                     successful, reply_content = (
                         result['status'],
                         result['content']
@@ -66,9 +71,14 @@ class CPHOSBot(Bot):
                     reply = Reply(ReplyType.ERROR, retstring)
                 return reply
 
-    def reply_text(self, session, retry_count=0):
+    def reply_text(self, session,user_nickname, retry_count=0):
         try:
-            return {'status': True, "content": "Hello, World!"}
+            messages = session.messages # [{'role': 'user', 'content': '<Empty Message>'}, {'role': 'assistant', 'content': 'Hello, World!'}, {'role': 'user', 'content': 'what is my last msg'}, {'role': 'assistant', 'content': 'Hello, World!'}, {'role': 'user', 'content': 'jsndhs'}]
+            final_msg =  messages[-1]['content'].replace(EMPTY_TOKEN, '')
+            if final_msg == '':
+                return {'status': True, 'content': '不应该发送空消息。' + CPHOSBot.HELP_MSG}
+            return {'status':True, 'content': answer_user_question(user_nickname,final_msg)}
+            # return {'status': True, "content": "Hello, World!"}
         except Exception as e:
             need_retry = retry_count < 2
             logger.warn("[CPHOSBot] Generation Exception: {}".format(e))

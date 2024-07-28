@@ -9,6 +9,7 @@ from bridge.context import *
 from bridge.reply import *
 from channel.channel import Channel
 from common.dequeue import Dequeue
+from common.const import EMPTY_TOKEN
 from common import memory
 from plugins import *
 
@@ -175,7 +176,7 @@ class ChatChannel(Channel):
             else:
                 context.type = ContextType.TEXT
             if content.strip() == "":
-                context.content = '<Empty Message>'
+                context.content = EMPTY_TOKEN
             else:
                 context.content = content.strip()
             if "desire_rtype" not in context and conf().get("always_reply_voice") and ReplyType.VOICE not in self.NOT_SUPPORT_REPLYTYPE:

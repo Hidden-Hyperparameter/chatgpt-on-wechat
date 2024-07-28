@@ -1,3 +1,6 @@
+# Special Token
+EMPTY_TOKEN = '<Empty Message>'
+
 # bot_type
 CPHOS = 'CPHOS' # Our bot
 OPEN_AI = CHATGPT = BAIDU = XUNFEI = CHATGPTONAZURE = LINKAI = CLAUDEAI = CLAUDEAPI= QWEN = QWEN_DASHSCOPE = GEMINI = ZHIPU_AI = MOONSHOT = MiniMax = NotImplementedError
