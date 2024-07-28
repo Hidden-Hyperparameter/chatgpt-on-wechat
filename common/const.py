@@ -1,21 +1,7 @@
 # bot_type
-OPEN_AI = "openAI"
-CHATGPT = "chatGPT"
-BAIDU = "baidu"  # 百度文心一言模型
-XUNFEI = "xunfei"
-CHATGPTONAZURE = "chatGPTOnAzure"
-LINKAI = "linkai"
-CLAUDEAI = "claude"  # 使用cookie的历史模型
-CLAUDEAPI= "claudeAPI"  # 通过Claude api调用模型
-QWEN = "qwen"  # 旧版通义模型
-QWEN_DASHSCOPE = "dashscope"  # 通义新版sdk和api key
-
-
-GEMINI = "gemini"  # gemini-1.0-pro
-ZHIPU_AI = "glm-4"
-MOONSHOT = "moonshot"
-MiniMax = "minimax"
-
+CPHOS = 'CPHOS' # Our bot
+OPEN_AI = CHATGPT = BAIDU = XUNFEI = CHATGPTONAZURE = LINKAI = CLAUDEAI = CLAUDEAPI= QWEN = QWEN_DASHSCOPE = GEMINI = ZHIPU_AI = MOONSHOT = MiniMax = NotImplementedError
+OPEN_AI = CPHOS # Otherwise, emit enourmous amount of errors in all kinds of files
 
 # model
 CLAUDE3 = "claude-3-opus-20240229"
@@ -60,12 +46,13 @@ MODEL_LIST = [
               GPT35, GPT35_0125, GPT35_1106, "gpt-3.5-turbo-16k",
               GPT_4o, GPT_4o_MINI, GPT4_TURBO, GPT4_TURBO_PREVIEW, GPT4_TURBO_01_25, GPT4_TURBO_11_06, GPT4, GPT4_32k, GPT4_06_13, GPT4_32k_06_13,
               WEN_XIN, WEN_XIN_4,
-              XUNFEI, ZHIPU_AI, MOONSHOT, MiniMax,
-              GEMINI, GEMINI_PRO, GEMINI_15_flash, GEMINI_15_PRO,
+              #XUNFEI, ZHIPU_AI, MOONSHOT, MiniMax, GEMINI, QWEN
+              GEMINI_PRO, GEMINI_15_flash, GEMINI_15_PRO,
               "claude", "claude-3-haiku", "claude-3-sonnet", "claude-3-opus", "claude-3-opus-20240229", "claude-3.5-sonnet",
               "moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k",
-              QWEN, QWEN_TURBO, QWEN_PLUS, QWEN_MAX,
-              LINKAI_35, LINKAI_4_TURBO, LINKAI_4o
+              QWEN_TURBO, QWEN_PLUS, QWEN_MAX,
+              LINKAI_35, LINKAI_4_TURBO, LINKAI_4o,
+              CPHOS
             ]
 
 # channel
