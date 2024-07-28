@@ -30,37 +30,43 @@ class CPHOSBot(Bot):
 
         self.sessions = SessionManager(CPHOSWechatSession)
 
+    @staticmethod
+    def get_sender_real_nickname(message):
+        try:
+            user_id = message.__dict__['actual_user_id']
+            chatroom_memberlist = message.__dict__['_rawmsg']['User']['MemberList']
+            for member in chatroom_memberlist:
+                if member['UserName'] == user_id:
+                    return member['NickName']
+        except:
+            logger.error('Fatal: cannot process message',message.__dict__)
+
     def reply(self, query, context=None):
         print('-'*20)
         # acquire reply content
-        user_nickname = context["msg"].from_user_nickname
+        user_nickname = self.get_sender_real_nickname(context['msg'])
+        # print('context kwargs:',context['msg'].__dict__)
         if context and context.type:
             if context.type == ContextType.TEXT:
                 logger.info("[CPHOSBot] query={}".format(query))
                 session_id = context["session_id"]
                 reply = None
-                if query == "#清除记忆":
-                    self.sessions.clear_session(session_id)
-                    reply = Reply(ReplyType.INFO, "记忆已清除")
-                elif query == "#清除所有":
-                    self.sessions.clear_all_session()
-                    reply = Reply(ReplyType.INFO, "所有人记忆已清除")
-                else:
-                    session = self.sessions.session_query(query, session_id)
-                    result = self.reply_text(session,user_nickname)
-                    successful, reply_content = (
-                        result['status'],
-                        result['content']
-                    )
-                    logger.debug(
-                        "[CPHOSBot] new_query={}, session_id={}, reply_cont={}".format(session.messages, session_id, reply_content)
-                    )
+                
+                session = self.sessions.session_query(query, session_id)
+                result = self.reply_text(session,user_nickname)
+                successful, reply_content = (
+                    result['status'],
+                    result['content']
+                )
+                logger.debug(
+                    "[CPHOSBot] new_query={}, session_id={}, reply_cont={}".format(session.messages, session_id, reply_content)
+                )
 
-                    if not successful:
-                        reply = Reply(ReplyType.ERROR, reply_content)
-                    else:
-                        self.sessions.session_reply(reply_content, session_id)
-                        reply = Reply(ReplyType.TEXT, reply_content)
+                if not successful:
+                    reply = Reply(ReplyType.ERROR, reply_content)
+                else:
+                    self.sessions.session_reply(reply_content, session_id)
+                    reply = Reply(ReplyType.TEXT, reply_content)
                 return reply
             elif context.type == ContextType.IMAGE_CREATE:
                 ok, retstring = self.create_img(query, 0)
