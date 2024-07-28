@@ -2,6 +2,10 @@
 
 This project is forked from [zhayujie/chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat). 
 
+![](./demo_out.gif)
+
+(The actual robot may be slower due to network reasons.)
+
 ## Quick Start
 
 For building the robot on a remote server, see [server.md](./server.md).
@@ -20,7 +24,7 @@ conda activate CPHOS # Or: source activate CPHOS
 pip install -r requirements.txt
 ```
 
-2. Add API Key
+2. Add API Key and copy model
 
 ```bash
 vim bot/CPHOS_bot/cphos_model/.env
@@ -33,27 +37,89 @@ OPENAI_API_KEY="sk-your-openai-api-key"
 API_KEY="your.glmapikey"
 ```
 
+Then copy the model into the folder:
+
+```bash
+rm -rf bot/CPHOS_bot/cphos_model/universal-sentence-encoder-multilingual
+mv /path/to/your/model/folder bot/CPHOS_bot/cphos_model/universal-sentence-encoder-multilingual
+```
+
 3. Run
 
 ```bash
 cp config-CPHOS.json config.json
-nohup python3 app.py & tail -f nohup.out
+rm nohup.out ; nohup python3 app.py & tail -f nohup.out
 ```
 
 The QR code will emit in the terminal! Scan it with your WeChat to login. Then the robot will start to work.
 
 4. Test
 
-Try to at the robot in the group "CPHOS技术组工作群" or send a message starting with "@bot" in that group. The robot should reply.
+Try to `@` the robot in the group "CPHOS技术组工作群" or send a message starting with `@bot` in that group. The robot should reply.
 
-### The Current Functions of the Robot
+The first message will be slow, since the model is loaded during the first response. The subsequent messages will be faster.
 
-1. Whatever message you send, the robot only replies "Hello, World!"
-2. Special tokens:
-    - `#清除记忆`
-    - `#清除所有`
+5. To stop:
+```bash
+jobs
+```
 
-You can find the special tokens in [cphos_bot.py](./bot/CPHOS_bot/cphos_bot.py).
+Find the job number, say `1`, then:
+
+```bash
+kill -9 %1
+```
+
+### Understanding the Output
+
+You can see lots of output in the terminal. Here is a general structure:
+
+```
+... Information before the QR code ...
+█▀▀▀▀▀▀▀█▀███▀████▀████▀▀▀▀▀▀▀█
+(QR code will emit here)
+... Information after the QR code ...
+Please press confirm on your phone.
+
+(You scan the code and confirm on your phone)
+
+Loading the contact, this may take a little while.
+[INFO][2024-07-28 14:59:58][wechat_channel.py:131] - Wechat login success, user_id: @xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, nickname: YOUR_WECHAT_NICK_NAME
+Start auto replying.
+
+(You send a message which triggers the robot. Note that only some messages can trigger the robot.)
+
+[INFO][2024-07-28 15:00:11][bridge.py:68] - create bot CPHOS for chat
+... DataBase Init Messages (see ./bot/CPHOS_bot/cphos_model/db_api/__init__.py) ...
+```
+
+If all of these pass without errors, then the remaining parts are regular logs. A regular log corresponding to a message has highlights, which denote different roles of LLM. Details can be found below.
+
+### Message processing
+
+The original idea is from [Jingzhe Shi](https://github.com/JingzheShi).
+
+Each message is processed by two ways (the entry point is at [`answer_user_question`](./bot/CPHOS_bot/cphos_model/work_file.py)), and finally the two results are combined.
+
+1. Type `A`: The message is treated as a *operation*, which involves querying the database. 
+    - Examples:
+      - `把我改成批第四题的吧`
+      - `我还有多少题没有批改？`
+    - One model (`Executor`) generates a function based on the user query, chosen from the available function pool. Then the function is executed.
+    - Of course, the question may not always be type `A`. But such classification is difficult, so the model will try to generate a function for **all** messages. Thus, the execution may fail. For example:
+      ```
+      >>> Q:如何阅卷？
+      >>> type A response: 修改老师的批阅题目，但题目号未给出。
+      ```
+2. Type `B`: The message is treated as a *question*, which involves generating a response.
+    - Examples:
+      - `如何阅卷？`
+      - `如何修改学生信息？`
+    - Firstly, one model (`Classifier`) classifies the question into `A,B,C,D,E,F`, each corresponding to a question-answer set. There is also `G` for other questions, such as `今天天气怎么样？`. The model will not answer `G` questions.
+    - In each set (say `A`), the query is embedded by [universal-sentence-encoder-multilingual](https://tfhub.dev/google/universal-sentence-encoder-multilingual/3). Then, a nearest-neighbor search is performed to find the most similar question in the question-answer set. 
+    - Finally, a model (`Summarizer`) use the text found from the question-answer set and summarizes it.
+3. Both type `A` and type `B` responses are tried multiple times. This idea is adapted from [CHOPS](https://github.com/JingzheShi/CHOPS). For each time, the model response is examined by a `Verifier`, which outputs whether the response is valid or not. If valid then the loop immediately stops; otherwise, the next response is tried.
+4. Finally: a model (`Chooser`) chooses whether the `type A` response or the `type B` response is more appropriate. The final response is one of the two.
 
 
 ## Changing Configurations
@@ -81,11 +147,11 @@ Please refer to the original [README](#二配置) for the configurations. Here, 
 
 ## Development
 
-The interface is [cphos_bot.py](./bot/CPHOS_bot/cphos_bot.py), so ideally all modifications can be done inside the file.
+The interface is [cphos_bot.py](./bot/CPHOS_bot/cphos_bot.py), so ideally all modifications can be done inside the file. If you don't want to change the robot, you can just change [work file](./bot/CPHOS_bot/cphos_model/work_file.py)
 
 For reference, the member function `ChatChannel._compose_context` in [chat_channel.py](./channel/chat_channel.py) defines how the messages received in WeChat are processed. If you want to change the functions, you can modify it.
 
-The whole structure and the calling hierarchy of the project are very complex and I can't understand all of them.
+The whole structure and the calling hierarchy of the WeChat Interface are very complex and I can't understand all of them.
 
 ## The original README.md is as follows
 
