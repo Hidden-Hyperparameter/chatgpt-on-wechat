@@ -39,9 +39,14 @@ API_KEY="your.glmapikey"
 
 Then copy the model into the folder:
 
+(note: the script below isn't tested, you may need to modify it)
+
 ```bash
 # Download the model from https://tfhub.dev/google/universal-sentence-encoder-multilingual/3
-mv /path/to/your/model/folder bot/CPHOS_bot/cphos_model/universal-sentence-encoder-multilingual
+wget https://www.kaggle.com/api/v1/models/google/universal-sentenc
+e-encoder/tensorFlow2/multilingual/2/download ./universal-sentence-encoder-multilingual.tar.gz
+tar -xvf universal-sentence-encoder-multilingual.tar.gz ./universal-sentence-encoder-multilingual
+mv universal-sentence-encoder-multilingual bot/CPHOS_bot/cphos_model/
 ```
 
 3. Run
@@ -69,6 +74,32 @@ Find the job number, say `1`, then:
 ```bash
 kill -9 %1
 ```
+
+## Possible settings
+
+### VPN
+
+```python
+os.environ['HTTP_PROXY']="http://127.0.0.1:7890"
+os.environ['HTTPS_PROXY']="http://127.0.0.1:7890"
+os.environ['ALL_PROXY']="socks5://127.0.0.1:7893"
+```
+
+These three lines in [`__init__.py`](https://github.com/Hidden-Hyperparameter/CPHOS_AIReplyer_Playground/blob/main/__init__.py) can be used to set the proxy. You should set up the proxy depending on your network environment.
+
+### Model
+
+```python
+CLASSIFIER_ENGINE = 'chatglm_turbo'
+EXECUTER_ENGINE = 'chatglm_turbo'
+# EXECUTER_ENGINE = 'gpt-3.5-turbo'
+VERIFIER_ENGINE = 'chatglm_turbo'
+# VERIFIER_ENGINE = 'gpt-3.5-turbo'
+```
+
+These three lines in [`utils.py`](https://github.com/Hidden-Hyperparameter/CPHOS_AIReplyer_Playground/blob/main/utils/utils.py) can be used to select the models for classifier, executer, and verifier.
+
+## Documentation
 
 ### Understanding the Output
 
@@ -99,7 +130,7 @@ If all of these pass without errors, then the remaining parts are regular logs. 
 
 The original idea is from [Jingzhe Shi](https://github.com/JingzheShi).
 
-Each message is processed by two ways (the entry point is at [`answer_user_question`](./bot/CPHOS_bot/cphos_model/work_file.py)), and finally the two results are combined.
+Each message is processed by two ways (the entry point is at [`answer_user_question`](https://github.com/Hidden-Hyperparameter/CPHOS_AIReplyer_Playground/blob/main/work_file.py#L44)), and finally the two results are combined.
 
 1. Type `A`: The message is treated as a *operation*, which involves querying the database. 
     - Examples:

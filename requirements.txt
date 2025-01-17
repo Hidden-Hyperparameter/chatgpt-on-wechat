@@ -9,7 +9,8 @@ web.py
 linkai>=0.0.6.0
 
 # These requirements are for the CPHOS model package
-zhipuai==1.0.7
+# zhipuai==1.0.7
+zhipuai>=2.0.0
 pymysql
 openpyxl
 numpy
@@ -26,3 +27,6 @@ regex
 openai<1.0.0
 # required for openai
 aiohttp
+
+python-dotenv
+httpx[socks]
